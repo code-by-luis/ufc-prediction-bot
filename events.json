@@ -1,0 +1,12 @@
+{
+  "FightNight": {
+    "date": "2024-12-15",
+    "fights": [
+      {
+        "fighter1": "Buckley",
+        "fighter2": "Covington",
+        "winner": null
+      }
+    ]
+  }
+}
