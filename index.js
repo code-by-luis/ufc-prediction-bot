@@ -1,8 +1,16 @@
-const { Client, Intents, GatewayIntentBits } = require("discord.js");
+const {
+  Client,
+  Intents,
+  ActionRowBuilder,
+  ButtonBuilder,
+  GatewayIntentBits,
+} = require("discord.js");
 const fs = require("fs");
+const axios = require("axios");
+const cheerio = require("cheerio");
 
 const TOKEN =
-  "";
+  "PLACEHOLDER;
 
 const client = new Client({
   intents: [
@@ -14,6 +22,76 @@ const client = new Client({
 
 let events = {};
 let predictions = {};
+
+// Function to scrape UFC event data along with fight details
+async function addEvent(url) {
+  try {
+    // Fetch the event page content
+    const { data } = await axios.get(url);
+
+    // Load the HTML data into Cheerio for parsing
+    const $ = cheerio.load(data);
+
+    // Scrape the event details
+    const eventName = $("h1").text().trim();
+    const eventDate = "test";
+
+    if (!eventName || !eventDate) {
+      throw new Error("Could not find event details.");
+    }
+
+    // Scrape the fight details
+    let fights = [];
+
+    $(".c-listing-fight__names-row").each((index, element) => {
+      const fighter1Name = $(element)
+        .find(
+          ".c-listing-fight__corner-name--red .c-listing-fight__corner-given-name"
+        )
+        .text()
+        .trim();
+      const fighter2Name = $(element)
+        .find(
+          ".c-listing-fight__corner-name--blue .c-listing-fight__corner-given-name"
+        )
+        .text()
+        .trim();
+
+      const fighter1Name2 = $(element)
+        .find(
+          ".c-listing-fight__corner-name--red .c-listing-fight__corner-family-name"
+        )
+        .text()
+        .trim();
+      const fighter2Name2 = $(element)
+        .find(
+          ".c-listing-fight__corner-name--blue .c-listing-fight__corner-family-name"
+        )
+        .text()
+        .trim();
+
+      const fullName1 = fighter1Name + " " + fighter1Name2;
+      const fullName2 = fighter2Name + " " + fighter2Name2;
+
+      if (fullName1 && fullName2) {
+        fights.push({
+          fighter1: fullName1,
+          fighter2: fullName2,
+          result: 0,
+        });
+      }
+    });
+
+    return {
+      eventName,
+      eventDate,
+      fights,
+    };
+  } catch (error) {
+    console.error("Error scraping UFC event:", error);
+    return null;
+  }
+}
 
 function loadData() {
   // Load events
@@ -34,7 +112,6 @@ function loadData() {
 }
 
 function saveData() {
-  fs.writeFileSync("events.json", JSON.stringify(events, null, 2), "utf8");
   fs.writeFileSync(
     "predictions.json",
     JSON.stringify(predictions, null, 2),
@@ -54,195 +131,241 @@ client.on("messageCreate", (message) => {
   const args = message.content.split(" ");
   const command = args.shift().toLowerCase(); // first word is the command
 
+  // Command for adding an event
   if (command === "!addevent") {
-    // Usage: !addEvent UFC280 2024-01-01
-    const eventName = args[0];
-    const eventDate = args[1];
-    if (!eventName || !eventDate) {
-      return message.channel.send("Usage: !addEvent <EventName> <YYYY-MM-DD>");
+    const eventUrl = args[0];
+    if (!eventUrl) {
+      return message.channel.send("Please provide a valid UFC event URL.");
     }
 
-    events[eventName] = {
-      date: eventDate,
-      fights: [],
-    };
-    saveData();
-    message.channel.send(`Event ${eventName} added for date ${eventDate}.`);
-  } else if (command === "!addfight") {
-    // Usage: !addFight UFC280 "Fighter One" "Fighter Two"
-    const eventName = args.shift();
-    if (!events[eventName]) {
-      return message.channel.send(`Event ${eventName} does not exist.`);
-    }
+    addEvent(eventUrl).then((eventData) => {
+      if (!eventData) {
+        return message.channel.send("Failed to scrape event data.");
+      }
 
-    // The remaining args should be fighter names.
-    // You can parse quotes or just assume they come in a simpler format.
-    // For simplicity, let's assume fighters are just the next two words:
-    const fighter1 = args[0];
-    const fighter2 = args[1];
+      console.log(JSON.stringify(eventData));
 
-    if (!fighter1 || !fighter2) {
-      return message.channel.send(
-        "Usage: !addFight <EventName> <Fighter1> <Fighter2>"
+      events.push({
+        eventName: eventData.eventName,
+        date: eventData.eventDate,
+        fights: eventData.fights,
+      });
+
+      console.log(JSON.stringify(events));
+
+      // Save the updated events data
+      fs.writeFileSync("events.json", JSON.stringify(events, null, 2), "utf8");
+
+      message.channel.send(
+        `Event "${eventData.eventName}" added successfully with ${eventData.fights.length} fights.`
       );
+    });
+  }
+
+  if (command === "!mypredictions") {
+    if (!Object.keys(predictions).length) {
+      return message.channel.send("You haven't made any predictions yet.");
     }
 
-    events[eventName].fights.push({ fighter1, fighter2, winner: null });
-    saveData();
-    message.channel.send(
-      `Fight added to ${eventName}: ${fighter1} vs. ${fighter2}`
+    const userPredictions = Object.keys(predictions).filter(
+      (event) => predictions[event][message.author.id]
     );
-  } // After the existing commands...
-  else if (command === "!predict") {
-    // Usage: !predict UFC280 0 Charles
-    // Means: For the event UFC280, fight at index 0, pick Charles
-    const eventName = args[0];
-    const fightIndex = parseInt(args[1], 10);
-    const pick = args[2];
 
-    if (!events[eventName]) {
-      return message.channel.send(`Event ${eventName} not found.`);
-    }
-    if (isNaN(fightIndex) || !events[eventName].fights[fightIndex]) {
-      return message.channel.send(
-        `Fight index ${fightIndex} not valid for event ${eventName}.`
-      );
+    if (userPredictions.length === 0) {
+      return message.channel.send("You have no predictions for any events.");
     }
 
-    const fight = events[eventName].fights[fightIndex];
-    if (pick !== fight.fighter1 && pick !== fight.fighter2) {
-      return message.channel.send(
-        `Your pick must be one of the fighters: ${fight.fighter1} or ${fight.fighter2}`
-      );
-    }
+    const eventButtons = userPredictions.map((event, index) => {
+      return new ButtonBuilder()
+        .setCustomId(`viewPredictions-${index}`)
+        .setLabel(event)
+        .setStyle("Primary");
+    });
 
-    const userId = message.author.id;
-    if (!predictions[userId]) predictions[userId] = {};
-    if (!predictions[userId][eventName]) predictions[userId][eventName] = {};
+    const row = new ActionRowBuilder().addComponents(eventButtons);
 
-    predictions[userId][eventName][fightIndex] = pick;
+    message.channel.send({
+      content: "Select an event to view your predictions:",
+      components: [row],
+    });
+  }
 
-    saveData();
+  // Command to show the next event
+  if (command === "!showNextEvent") {
+    // Format the message with the event name and all the fights
+    let response = `Next Event: **${events[0].eventName}**\nDate: ${events[0].date}\nFights:\n`;
 
-    message.channel.send(
-      `You predicted ${pick} for fight #${fightIndex} in ${eventName}`
-    );
-  } else if (command === "!mypredictions") {
-    // Usage: !mypredictions UFC280
-    const eventName = args[0];
-    const userId = message.author.id;
-
-    if (!predictions[userId] || !predictions[userId][eventName]) {
-      return message.channel.send(
-        `You have not made any predictions for ${eventName}.`
-      );
-    }
-
-    const userPreds = predictions[userId][eventName];
-    let response = `Your predictions for ${eventName}:\n`;
-
-    events[eventName].fights.forEach((fight, index) => {
-      const pick = userPreds[index];
-      response += `Fight #${index}: ${fight.fighter1} vs. ${
-        fight.fighter2
-      } => You picked: ${pick ? pick : "No prediction"}\n`;
+    events[0].fights.forEach((fight, index) => {
+      response += `#${index}: ${fight.fighter1} vs ${fight.fighter2}\n`;
     });
 
     message.channel.send(response);
-  } else if (command === "!listevents") {
-    const eventNames = Object.keys(events);
-    if (eventNames.length === 0) {
-      return message.channel.send("No events currently exist.");
-    }
-
-    let response = "Current Events:\n";
-    for (const [name, eventData] of Object.entries(events)) {
-      response += `${name} - Date: ${eventData.date}, Fights: ${eventData.fights.length}\n`;
-    }
-    message.channel.send(response);
-  } else if (command === "!deleteevent") {
-    const eventName = args[0];
-    if (!eventName) {
-      return message.channel.send("Usage: !deleteEvent <EventName>");
-    }
-
-    if (!events[eventName]) {
-      return message.channel.send(`Event ${eventName} does not exist.`);
-    }
-
-    delete events[eventName];
-    saveData();
-    message.channel.send(`Event ${eventName} has been deleted.`);
-  } else if (command === "!removefight") {
-    const eventName = args[0];
-    const fightIndex = parseInt(args[1], 10);
-
-    if (!eventName || isNaN(fightIndex)) {
-      return message.channel.send(
-        "Usage: !removeFight <EventName> <FightIndex>"
-      );
-    }
-
-    if (!events[eventName]) {
-      return message.channel.send(`Event ${eventName} does not exist.`);
-    }
-
-    if (!events[eventName].fights[fightIndex]) {
-      return message.channel.send(
-        `Fight index ${fightIndex} is not valid for event ${eventName}.`
-      );
-    }
-
-    // Remove the fight
-    events[eventName].fights.splice(fightIndex, 1);
-
-    // Save changes
-    saveData();
-
-    message.channel.send(`Fight #${fightIndex} removed from ${eventName}.`);
-  } else if (command === "!guide") {
-    const guideMessage = `
-**UFC Prediction Bot Commands**
-
-**!addEvent <EventName> <YYYY-MM-DD>**
-- Description: Adds a new event with the given name and date.
-- Example: !addEvent UFC280 2024-01-01
-
-**!addFight <EventName> <Fighter1> <Fighter2>**
-- Description: Adds a fight to the specified event.
-- Example: !addFight UFC280 Charles Islam
-
-**!removeFight <EventName> <FightIndex>**
-- Description: Removes the fight at the given index from the specified event.
-- Example: !removeFight UFC280 0
-
-**!deleteEvent <EventName>**
-- Description: Deletes the specified event and all its fights/predictions.
-- Example: !deleteEvent UFC280
-
-**!predict <EventName> <FightIndex> <FighterName>**
-- Description: Records your prediction for the winner of a specified fight in an event.
-- Example: !predict UFC280 0 Charles
-
-**!myPredictions <EventName>**
-- Description: Lists all your predictions for a given event.
-- Example: !myPredictions UFC280
-
-**!listEvents**
-- Description: Shows all current events, their dates, and the number of fights.
-- Example: !listEvents
-
-**!guide**
-- Description: Displays this help guide with all available commands.
-
-**Note:**
-- When adding or predicting fights, the "FightIndex" starts from 0 for the first fight in an event.
-- Make sure to use exact EventNames and fighter names as added.`;
-
-    message.channel.send(guideMessage);
   }
 
+  if (command === "!p") {
+    if (events.length === 0) {
+      return message.channel.send("No upcoming events available.");
+    }
 
+    // Show list of events with buttons
+    const eventButtons = events.map((event, index) => {
+      return new ButtonBuilder()
+        .setCustomId(`selectEvent-${index}`)
+        .setLabel(event.eventName)
+        .setStyle("Primary");
+    });
+
+    const row = new ActionRowBuilder().addComponents(eventButtons);
+
+    message.channel.send({
+      content: "Select an event to predict on:",
+      components: [row],
+    });
+  }
+});
+
+client.on("interactionCreate", async (interaction) => {
+  if (!interaction.isButton()) return;
+
+  const [type, eventIndex, fightIndex, fighterIndex] = interaction.customId.split("-");
+
+  if (type === "selectEvent") {
+    const selectedEvent = events[eventIndex];
+    let fightButtons = selectedEvent.fights.map((fight, index) => {
+      return new ButtonBuilder()
+        .setCustomId(`selectFight-${eventIndex}-${index}`)
+        .setLabel(`${fight.fighter1} vs ${fight.fighter2}`)
+        .setStyle("Primary");
+    });
+
+    // Split fight buttons into multiple ActionRows if there are more than 5 buttons
+    const fightButtonRows = [];
+    while (fightButtons.length > 0) {
+      fightButtonRows.push(fightButtons.splice(0, 5)); // Take up to 5 buttons at a time
+    }
+
+    // Create action rows with the split buttons
+    const rows = fightButtonRows.map((row) =>
+      new ActionRowBuilder().addComponents(row)
+    );
+
+    interaction.update({
+      content: `Select a fight for event: **${selectedEvent.eventName}**`,
+      components: rows,
+    });
+  }
+
+ if (type === "selectFight") {
+   const selectedEvent = events[eventIndex];
+   const selectedFight = selectedEvent.fights[fightIndex];
+
+   const predictionButtons = [
+     new ButtonBuilder()
+       .setCustomId(`predict-${eventIndex}-${fightIndex}-1`)
+       .setLabel(`Predict ${selectedFight.fighter1}`)
+       .setStyle("Success"),
+     new ButtonBuilder()
+       .setCustomId(`predict-${eventIndex}-${fightIndex}-2`)
+       .setLabel(`Predict ${selectedFight.fighter2}`)
+       .setStyle("Success"),
+   ];
+
+   // Add a "Back" button to go back to the fight list
+   const backButton = new ButtonBuilder()
+     .setCustomId(`backToFights-${eventIndex}`)
+     .setLabel("Back")
+     .setStyle("Secondary");
+
+   const row = new ActionRowBuilder().addComponents(
+     ...predictionButtons,
+     backButton
+   );
+
+   interaction.update({
+     content: `Who do you predict will win: ${selectedFight.fighter1} vs ${selectedFight.fighter2}?`,
+     components: [row],
+   });
+ }
+
+
+ if (type === "predict") {
+   const selectedEvent = events[eventIndex];
+   const selectedFight = selectedEvent.fights[fightIndex];
+   const fighterPredicted = fighterIndex === "1" ? selectedFight.fighter1 : selectedFight.fighter2;
+
+
+    if (!predictions[selectedEvent.eventName]) {
+      predictions[selectedEvent.eventName] = {};
+    }
+
+    if (!predictions[selectedEvent.eventName][interaction.user.id]) {
+      predictions[selectedEvent.eventName][interaction.user.id] = [];
+    }
+
+     predictions[selectedEvent.eventName][interaction.user.id].push({
+       fight: `${selectedFight.fighter1} vs ${selectedFight.fighter2}`,
+       prediction: fighterPredicted,
+     });
+
+     interaction.update(
+       `Prediction saved! You predict ${fighterPredicted} will win the fight: ${selectedFight.fighter1} vs ${selectedFight.fighter2}.`
+     );
+
+
+   fs.writeFileSync(
+     "predictions.json",
+     JSON.stringify(predictions, null, 2),
+     "utf8"
+   );
+ }
+
+ if (type === "viewPredictions") {
+   const userEvents = Object.keys(predictions).filter(
+     (event) => predictions[event][interaction.user.id]
+   );
+
+   const selectedEvent = userEvents[eventIndex];
+
+   const userPredictions = predictions[selectedEvent][interaction.user.id];
+
+   let response = `Your Predictions for **${selectedEvent}**:\n`;
+   userPredictions.forEach((p, index) => {
+     response += `${
+       p.fight
+     }\n➡ **Predicted Winner:** ${p.prediction}\n\n`;
+   });
+
+   interaction.update({
+     content: response,
+     components: [],
+   });
+ }
+
+ if (type === "backToFights") {
+   const selectedEvent = events[eventIndex];
+
+   let fightButtons = selectedEvent.fights.map((fight, index) => {
+     return new ButtonBuilder()
+       .setCustomId(`selectFight-${eventIndex}-${index}`)
+       .setLabel(`${fight.fighter1} vs ${fight.fighter2}`)
+       .setStyle("Primary");
+   });
+
+   // Split fight buttons into multiple ActionRows if there are more than 5
+   const fightButtonRows = [];
+   while (fightButtons.length > 0) {
+     fightButtonRows.push(fightButtons.splice(0, 5));
+   }
+
+   const rows = fightButtonRows.map((row) =>
+     new ActionRowBuilder().addComponents(row)
+   );
+
+   interaction.update({
+     content: `Select a fight for event: **${selectedEvent.eventName}**`,
+     components: rows,
+   });
+ }
 
 });
 

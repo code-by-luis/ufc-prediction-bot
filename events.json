@@ -1,12 +1,251 @@
-{
-  "FightNight": {
-    "date": "2024-12-15",
+[
+  {
+    "eventName": "UFC Fight Night",
+    "date": "test",
     "fights": [
       {
-        "fighter1": "Buckley",
-        "fighter2": "Covington",
-        "winner": null
+        "fighter1": "Israel Adesanya",
+        "fighter2": "Nassourdine Imavov",
+        "result": 0
+      },
+      {
+        "fighter1": "Shara Magomedov",
+        "fighter2": "Michael Page",
+        "result": 0
+      },
+      {
+        "fighter1": "Sergei Pavlovich",
+        "fighter2": "Jairzinho Rozenstruik",
+        "result": 0
+      },
+      {
+        "fighter1": "Said Nurmagomedov",
+        "fighter2": "Vinicius Oliveira",
+        "result": 0
+      },
+      {
+        "fighter1": " ",
+        "fighter2": "Mike Davis",
+        "result": 0
+      },
+      {
+        "fighter1": " ",
+        "fighter2": "Kaan Ofli",
+        "result": 0
+      },
+      {
+        "fighter1": "Shamil Gaziev",
+        "fighter2": "Thomas Petersen",
+        "result": 0
+      },
+      {
+        "fighter1": "Terrance McKinney",
+        "fighter2": " ",
+        "result": 0
+      },
+      {
+        "fighter1": "Jasmine Jasudavicius",
+        "fighter2": "Mayra Bueno Silva",
+        "result": 0
+      },
+      {
+        "fighter1": "Bogdan Grad",
+        "fighter2": "Lucas Alexander",
+        "result": 0
+      },
+      {
+        "fighter1": "Hamdy Abdelwahab",
+        "fighter2": "Jamal Pogues",
+        "result": 0
+      }
+    ]
+  },
+  {
+    "eventName": "UFC 312",
+    "date": "test",
+    "fights": [
+      {
+        "fighter1": "Dricus Du Plessis",
+        "fighter2": "Sean Strickland",
+        "result": 0
+      },
+      {
+        "fighter1": " ",
+        "fighter2": "Tatiana Suarez",
+        "result": 0
+      },
+      {
+        "fighter1": "Justin Tafa",
+        "fighter2": "Tallison Teixeira",
+        "result": 0
+      },
+      {
+        "fighter1": " ",
+        "fighter2": "Rodolfo Bellato",
+        "result": 0
+      },
+      {
+        "fighter1": " ",
+        "fighter2": "Francisco Prado",
+        "result": 0
+      },
+      {
+        "fighter1": "Jack Jenkins",
+        "fighter2": "Gabriel Santos",
+        "result": 0
+      },
+      {
+        "fighter1": "Tom Nolan",
+        "fighter2": "Viacheslav Borshchev",
+        "result": 0
+      },
+      {
+        "fighter1": "Wang Cong",
+        "fighter2": "Bruna Brasil",
+        "result": 0
+      },
+      {
+        "fighter1": "Colby Thicknesse",
+        "fighter2": "Aleksandre Topuria",
+        "result": 0
+      },
+      {
+        "fighter1": "Jonathan Micallef",
+        "fighter2": "Kevin Jousset",
+        "result": 0
+      },
+      {
+        "fighter1": "Quillan Salkilld",
+        "fighter2": "Anshul Jubli",
+        "result": 0
+      },
+      {
+        "fighter1": "HyunSung Park",
+        "fighter2": "Nyamjargal Tumendemberel",
+        "result": 0
+      }
+    ]
+  },
+  {
+    "eventName": "UFC Fight Night\n\n  UFC Fight Night",
+    "date": "test",
+    "fights": [
+      {
+        "fighter1": "Erin Blanchfield",
+        "fighter2": "Maycee Barber",
+        "result": 0
+      },
+      {
+        "fighter1": "Mateusz Gamrot",
+        "fighter2": "Ludovit Klein",
+        "result": 0
+      },
+      {
+        "fighter1": " ",
+        "fighter2": "Ramiz Brahimaj",
+        "result": 0
+      },
+      {
+        "fighter1": "Dustin Jacoby",
+        "fighter2": "Bruno Lopes",
+        "result": 0
+      },
+      {
+        "fighter1": "Ketlen Vieira",
+        "fighter2": "Macy Chiasson",
+        "result": 0
+      },
+      {
+        "fighter1": " ",
+        "fighter2": " ",
+        "result": 0
+      },
+      {
+        "fighter1": "Jafel Filho",
+        "fighter2": "Allan Nascimento",
+        "result": 0
+      },
+      {
+        "fighter1": "Kurt Holobaugh",
+        "fighter2": "Jordan Leavitt",
+        "result": 0
+      },
+      {
+        "fighter1": "Bolaji Oki",
+        "fighter2": "Michael Aswell",
+        "result": 0
+      },
+      {
+        "fighter1": "Rayanne Dos Santos",
+        "fighter2": "Alice Ardelean",
+        "result": 0
+      }
+    ]
+  },
+  {
+    "eventName": "UFC 316\n\n  UFC 316",
+    "date": "test",
+    "fights": [
+      {
+        "fighter1": "Merab Dvalishvili",
+        "fighter2": "Sean O'Malley",
+        "result": 0
+      },
+      {
+        "fighter1": "Julianna Peña",
+        "fighter2": "Kayla Harrison",
+        "result": 0
+      },
+      {
+        "fighter1": "Kelvin Gastelum",
+        "fighter2": "Joe Pyfer",
+        "result": 0
+      },
+      {
+        "fighter1": "Mario Bautista",
+        "fighter2": " ",
+        "result": 0
+      },
+      {
+        "fighter1": "Vicente Luque",
+        "fighter2": "Kevin Holland",
+        "result": 0
+      },
+      {
+        "fighter1": "Bruno Silva",
+        "fighter2": "Joshua Van",
+        "result": 0
+      },
+      {
+        "fighter1": "Johnny Walker",
+        "fighter2": " ",
+        "result": 0
+      },
+      {
+        "fighter1": "Serghei Spivac",
+        "fighter2": "Waldo Cortes Acosta",
+        "result": 0
+      },
+      {
+        "fighter1": " ",
+        "fighter2": " ",
+        "result": 0
+      },
+      {
+        "fighter1": " ",
+        "fighter2": "Wang Cong",
+        "result": 0
+      },
+      {
+        "fighter1": "Jeka Saragih",
+        "fighter2": "JooSang Yoo",
+        "result": 0
+      },
+      {
+        "fighter1": "Quillan Salkilld",
+        "fighter2": " ",
+        "result": 0
       }
     ]
   }
-}
+]

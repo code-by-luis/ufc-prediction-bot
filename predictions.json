@@ -1,7 +1,104 @@
 {
-  "1124314456751612047": {
-    "FightNight": {
-      "0": "Buckley"
-    }
+  "UFC Fight Night": {
+    "1124314456751612047": [
+      {
+        "fight": "Israel Adesanya vs Nassourdine Imavov",
+        "prediction": "Israel Adesanya"
+      },
+      {
+        "fight": "Shara Magomedov vs Michael Page",
+        "prediction": "Michael Page"
+      },
+      {
+        "fight": "Sergei Pavlovich vs Jairzinho Rozenstruik",
+        "prediction": "Sergei Pavlovich"
+      },
+      {
+        "fight": "Israel Adesanya vs Nassourdine Imavov",
+        "prediction": "Israel Adesanya"
+      },
+      {
+        "fight": "Shara Magomedov vs Michael Page",
+        "prediction": "Shara Magomedov"
+      },
+      {
+        "fight": "Sergei Pavlovich vs Jairzinho Rozenstruik",
+        "prediction": "Sergei Pavlovich"
+      },
+      {
+        "fight": "Sergei Pavlovich vs Jairzinho Rozenstruik",
+        "prediction": "Sergei Pavlovich"
+      }
+    ]
+  },
+  "UFC 312": {
+    "1124314456751612047": [
+      {
+        "fight": "Dricus Du Plessis vs Sean Strickland",
+        "prediction": "Sean Strickland"
+      }
+    ]
+  },
+  "UFC Fight Night\n\n  UFC Fight Night": {
+    "1124314456751612047": [
+      {
+        "fight": "Erin Blanchfield vs Maycee Barber",
+        "prediction": "Erin Blanchfield"
+      },
+      {
+        "fight": "Mateusz Gamrot vs Ludovit Klein",
+        "prediction": "Mateusz Gamrot"
+      },
+      {
+        "fight": "Kurt Holobaugh vs Jordan Leavitt",
+        "prediction": "Jordan Leavitt"
+      }
+    ]
+  },
+  "UFC 316\n\n  UFC 316": {
+    "1124314456751612047": [
+      {
+        "fight": "Julianna Peña vs Kayla Harrison",
+        "prediction": "Kayla Harrison"
+      },
+      {
+        "fight": "Merab Dvalishvili vs Sean O'Malley",
+        "prediction": "Sean O'Malley"
+      },
+      {
+        "fight": "Kelvin Gastelum vs Joe Pyfer",
+        "prediction": "Joe Pyfer"
+      },
+      {
+        "fight": "Vicente Luque vs Kevin Holland",
+        "prediction": "Kevin Holland"
+      },
+      {
+        "fight": "Bruno Silva vs Joshua Van",
+        "prediction": "Bruno Silva"
+      },
+      {
+        "fight": "Serghei Spivac vs Waldo Cortes Acosta",
+        "prediction": "Serghei Spivac"
+      }
+    ],
+    "729696647277445182": [
+      {
+        "fight": "Merab Dvalishvili vs Sean O'Malley",
+        "prediction": "Merab Dvalishvili"
+      },
+      {
+        "fight": "Julianna Peña vs Kayla Harrison",
+        "prediction": "Kayla Harrison"
+      },
+      {
+        "fight": "Kelvin Gastelum vs Joe Pyfer",
+        "prediction": "Joe Pyfer"
+      },
+      {
+        "fight": "Vicente Luque vs Kevin Holland",
+        "prediction": "Kevin Holland"
+      }
+    ]
   }
 }
